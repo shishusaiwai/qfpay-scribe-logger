@@ -1,0 +1,34 @@
+scribe_logger
+=============
+
+This package contains a low level interface for writing to Scribe,
+as well as a higher level log handler with plays nicely with Python's
+logging facilities.
+
+
+Logger Usage
+------------
+
+```python
+from scribe_logger.logger import ScribeLogHandler
+import logging
+
+my_logger = logging.getLogger('MyLogger')
+my_logger.setLevel(logging.DEBUG)
+
+scribe = ScribeLogHandler(category="test_category")
+scribe.setLevel(logging.DEBUG)
+my_logger.addHandler(scribe)
+
+my_logger.info("This is a test message")
+```
+
+Writer Usage
+------------
+
+```python
+from scribe_logger.writer import ScribeWriter
+writer = ScribeWriter('localhost', 1463, "category")
+writer.write("my message")
+writer.write("my message", 'another_category')
+```

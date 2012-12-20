@@ -75,8 +75,10 @@ class ScribeWriter(object):
             return True
         except Thrift.TException, tx:
             self.transport.close()
+            raise e
         except Exception, e:
             self.transport.close()
+            raise e
         finally:
             self.lock.release()
         return False

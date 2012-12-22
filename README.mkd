@@ -21,6 +21,17 @@ For example::
 
     fengxiang:localhost-Thinkpad:error
 
+Parameters
+----------
+
+ScribeLogHandler::
+
+    backup_file(required): The absolute path of the file used when scribe server is unavailable.
+    category(required)
+    host(option, default='127.0.0.1')
+    port(option, default=1463)
+    retry_interval(option, default=5): The interval used to check whether scribe server is available.
+
 Logger Usage
 ------------
 

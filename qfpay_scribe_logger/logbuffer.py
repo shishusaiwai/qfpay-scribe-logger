@@ -120,9 +120,7 @@ class LogBuffer(object):
         with self.handle_lock:
             oldest_group = self._get_oldest_group()
             for log in oldest_group:
-                if len(log) >= 1 and log[-1] != "\n":
-                    beautiful_log = "%s\n" % log
-                if retry_func(beautiful_log):
+                if retry_func(log):
                     oldest_group.remove(log)
             if oldest_group:
                 self._rewrite_oldest_group(oldest_group)

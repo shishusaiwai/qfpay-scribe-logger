@@ -45,8 +45,10 @@ class ScribeLogHandler(logging.Handler):
     category = property(get_category, set_category)
 
     def scribe_write(self, msg):
+        if len(msg) >= 1 and msg[-1] != "\n":
+            beautiful_msg = "%s\n" % msg
         try:
-            self.category_write(msg)
+            self.category_write(beautiful_msg)
         except:
             return False
         return True

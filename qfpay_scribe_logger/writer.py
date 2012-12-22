@@ -12,10 +12,10 @@ data in your own format.
 
 """
 from scribe import scribe
+from scribe.ttypes import ResultCode
 from thrift.transport import TTransport, TSocket
 from thrift.protocol import TBinaryProtocol
 from thrift import Thrift
-import time
 import threading
 
 
@@ -29,7 +29,7 @@ class ScribeWriter(object):
     def write(self, category, data):
         """Write data to scribe instance"""
 
-        if not self._is_scribe_ready():
+        if not self.is_scribe_ready():
             return
 
         if not isinstance(data, list):
@@ -37,24 +37,28 @@ class ScribeWriter(object):
 
         category = category or self.default_category
         messages = []
-        
+
         for msg in data:
             try:
                 entry = scribe.LogEntry(category=category, message=msg)
             except Exception, e:
                 entry = scribe.LogEntry(dict(category=category, message=msg))
-                
+
             messages.append(entry)
 
         self.lock.acquire()
         try:
-            self.client.Log(messages=messages)
+            res = self.client.Log(messages=messages)
         except Thrift.TException, tx:
             self.transport.close()
+            raise tx
         except Exception, e:
             self.transport.close()
+            raise e
         finally:
             self.lock.release()
+        if res != ResultCode.OK:
+            raise Thrift.TException("ResultCode is not OK.")
 
     def _configure_scribe(self, host, port):
         self.socket = TSocket.TSocket(host=host, port=port)
@@ -64,7 +68,7 @@ class ScribeWriter(object):
             trans=self.transport, strictRead=False, strictWrite=False)
         self.client = scribe.Client(iprot=self.protocol, oprot=self.protocol)
 
-    def _is_scribe_ready(self):
+    def is_scribe_ready(self):
         """Check to see if scribe is ready to be written to"""
         if self.transport.isOpen():
             return True
@@ -72,13 +76,9 @@ class ScribeWriter(object):
         self.lock.acquire()
         try:
             self.transport.open()
-            return True
-        except Thrift.TException, tx:
+        except Exception:
             self.transport.close()
-            raise e
-        except Exception, e:
-            self.transport.close()
-            raise e
+            return False
         finally:
             self.lock.release()
-        return False
+        return True

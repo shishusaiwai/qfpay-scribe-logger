@@ -1,34 +1,71 @@
-scribe_logger
-=============
+qfpay_scribe_logger
+===================
 
 This package contains a low level interface for writing to Scribe,
 as well as a higher level log handler which plays nicely with Python's
 logging facilities.
 
+For the higher level interface, there are some more convenience.
+When a scribe server is available, logs would be send to the server.
+Otherwise, logs would be saved in a local file specified by the contruct
+parameter "backup_file". There is a background thread which will periodly
+check whether the scribe server is available. If the server become available
+again, the logs saved in local file would be sent to the server automatically
+and logs in the local file would be deleted.
+
+It's highly recommanded that the category used should confirm to the following format::
+
+    <project name>:<machine name>:<log level>
+
+For example::
+
+    fengxiang:localhost-Thinkpad:error
 
 Logger Usage
 ------------
 
 ```python
-from scribe_logger.logger import ScribeLogHandler
 import logging
+import os
+import socket
 
-my_logger = logging.getLogger('MyLogger')
-my_logger.setLevel(logging.DEBUG)
+from qfpay_scribe_logger.logger import ScribeLogHandler
 
-scribe = ScribeLogHandler(category="test_category",
-        backup_file="/var/app/project/logs")
-scribe.setLevel(logging.DEBUG)
-my_logger.addHandler(scribe)
+from fengxiang.settings import LOG_ROOT
 
-my_logger.info("This is a test message")
+MACHINE_NAME = socket.gethostname()
+
+LOGGER = logging.getLogger("InterfaceLogger")
+LOGGER.setLevel(logging.DEBUG)
+LOG_FORMAT = '%(asctime)s %(filename)s %(lineno)d %(levelname)s %(message)s'
+formatter = logging.Formatter(LOG_FORMAT)
+
+debug_log_handler = logging.StreamHandler()
+debug_log_handler.setLevel(logging.DEBUG)
+debug_log_handler.setFormatter(formatter)
+
+info_backup_log_location = os.path.join(LOG_ROOT, "info.log")
+info_log_handler = ScribeLogHandler(category="fengxiang:%s:info" % MACHINE_NAME,
+        backup_file=info_backup_log_location)
+info_log_handler.setLevel(logging.INFO)
+info_log_handler.setFormatter(formatter)
+
+error_backup_log_location = os.path.join(LOG_ROOT, "error.log")
+error_log_handler = ScribeLogHandler(category="fengxiang:%s:error" % MACHINE_NAME,
+        backup_file=error_backup_log_location)
+error_log_handler.setLevel(logging.ERROR)
+error_log_handler.setFormatter(formatter)
+
+LOGGER.addHandler(debug_log_handler)
+LOGGER.addHandler(info_log_handler)
+LOGGER.addHandler(error_log_handler)
 ```
 
 Writer Usage
 ------------
 
 ```python
-from scribe_logger.writer import ScribeWriter
+from qfpay_scribe_logger.writer import ScribeWriter
 writer = ScribeWriter('localhost', 1463, "category")
 writer.write("my message")
 writer.write("my message", 'another_category')

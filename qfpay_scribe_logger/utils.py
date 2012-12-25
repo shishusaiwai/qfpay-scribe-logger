@@ -18,7 +18,7 @@ def ensure_path(abs_path):
     folder, filename = (os.path.dirname(abs_path),
             os.path.basename(abs_path))
     if not os.path.exists(folder):
-        os.path.makedirs(folder)
+        os.makedirs(folder)
     if not os.path.exists(abs_path):
         touch(abs_path)
 

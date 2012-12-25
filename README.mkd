@@ -71,13 +71,3 @@ LOGGER.addHandler(debug_log_handler)
 LOGGER.addHandler(info_log_handler)
 LOGGER.addHandler(error_log_handler)
 ```
-
-Writer Usage
-------------
-
-```python
-from qfpay_scribe_logger.writer import ScribeWriter
-writer = ScribeWriter('localhost', 1463, "category")
-writer.write("my message")
-writer.write("my message", 'another_category')
-```

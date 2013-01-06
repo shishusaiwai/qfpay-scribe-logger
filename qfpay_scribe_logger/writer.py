@@ -30,7 +30,7 @@ class ScribeWriter(object):
         """Write data to scribe instance"""
 
         if not self.is_scribe_ready():
-            return
+            return False
 
         if not isinstance(data, list):
             data = [data]
@@ -59,6 +59,7 @@ class ScribeWriter(object):
             self.lock.release()
         if res != ResultCode.OK:
             raise Thrift.TException("ResultCode is not OK.")
+        return True
 
     def _configure_scribe(self, host, port):
         self.socket = TSocket.TSocket(host=host, port=port)

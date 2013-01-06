@@ -29,8 +29,8 @@ class ScribeLogHandler(logging.Handler):
         self.category_write = \
                 functools.partial(self.writer.write, self.category)
         self.scribe_watcher = threading.Thread(target=self.handle_buffer)
+        self.scribe_watcher.setDaemon(True)
         self.scribe_watcher.start()
-        print "start the scribe_watcher"
         if extra:
             self.extra = ' '.join(extra)
         else:
@@ -48,10 +48,10 @@ class ScribeLogHandler(logging.Handler):
         if len(msg) >= 1 and msg[-1] != "\n":
             beautiful_msg = "%s\n" % msg
         try:
-            self.category_write(beautiful_msg)
+            res = self.category_write(beautiful_msg)
         except:
             return False
-        return True
+        return res
 
     def emit(self, record):
         msg = self.format(record)

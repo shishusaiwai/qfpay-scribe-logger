@@ -71,3 +71,29 @@ LOGGER.addHandler(debug_log_handler)
 LOGGER.addHandler(info_log_handler)
 LOGGER.addHandler(error_log_handler)
 ```
+
+Django Usage
+------------
+Change original file handler::
+
+    'membercard_debug_log': {
+        'level': 'INFO',
+        'class': 'logging.FileHandler',
+        'formatter': 'qfpaywebformat',
+        'filename': os.path.join(LOG_ROOT, "debug.log")
+    }
+
+To::
+
+    'membercard_debug_log': {
+        'level': 'DEBUG',
+        'class': 'qfpay_scribe_logger.logger.ScribeLogHandler',
+        'formatter': 'qfpaywebformat',
+        'backup_file': os.path.join(LOG_ROOT, "debug.log"),
+        'category': "membercard:cliu-ThinkPad:debug"
+    },
+
+Detail steps are:
+  #. change the logger class to "qfpay_scribe_logger.logger.ScribeLogHandler"
+  #. change the key "filename" to "backup_file"
+  #. add a key-value pair "category".

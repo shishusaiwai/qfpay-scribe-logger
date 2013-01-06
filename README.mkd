@@ -94,6 +94,7 @@ To::
     },
 
 Detail steps are:
-  #. change the logger class to "qfpay_scribe_logger.logger.ScribeLogHandler"
-  #. change the key "filename" to "backup_file"
-  #. add a key-value pair "category".
+
+  1. change the logger class to "qfpay_scribe_logger.logger.ScribeLogHandler"
+  2. change the key "filename" to "backup_file"
+  3. add a key-value pair "category".

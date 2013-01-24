@@ -21,6 +21,11 @@ For example::
 
     fengxiang:localhost-Thinkpad:error
 
+Install
+-------
+
+    get into the folder 'dependency', install each package first. Then install this package.
+
 Parameters
 ----------
 

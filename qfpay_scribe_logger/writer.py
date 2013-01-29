@@ -15,7 +15,6 @@ from scribe import scribe
 from scribe.ttypes import ResultCode
 from thrift.transport import TTransport, TSocket
 from thrift.protocol import TBinaryProtocol
-from thrift import Thrift
 import threading
 
 
@@ -41,24 +40,20 @@ class ScribeWriter(object):
         for msg in data:
             try:
                 entry = scribe.LogEntry(category=category, message=msg)
-            except Exception, e:
+            except Exception:
                 entry = scribe.LogEntry(dict(category=category, message=msg))
-
             messages.append(entry)
 
         self.lock.acquire()
         try:
             res = self.client.Log(messages=messages)
-        except Thrift.TException, tx:
+        except Exception:
             self.transport.close()
-            raise tx
-        except Exception, e:
-            self.transport.close()
-            raise e
+            return False
         finally:
             self.lock.release()
         if res != ResultCode.OK:
-            raise Thrift.TException("ResultCode is not OK.")
+            return False
         return True
 
     def _configure_scribe(self, host, port):
